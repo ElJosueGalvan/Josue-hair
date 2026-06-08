@@ -1,0 +1,2303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HAIR — Diagnóstico Capilar · Josué Morales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --bg2: #111116;
+    --bg3: #16161e;
+    --surface: #1c1c26;
+    --surface2: #22222e;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --gold: #c9a96e;
+    --gold2: #e8c98a;
+    --gold-dim: rgba(201,169,110,0.15);
+    --cream: #f0ebe2;
+    --muted: rgba(240,235,226,0.45);
+    --muted2: rgba(240,235,226,0.25);
+    --accent: #7c9a8e;
+    --accent2: #a3c4b5;
+    --danger: #c97070;
+    --warn: #c9a070;
+    --success: #7ca87c;
+    --r: 12px;
+    --r2: 18px;
+    --shadow: 0 8px 40px rgba(0,0,0,0.6);
+    --shadow2: 0 2px 12px rgba(0,0,0,0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRAIN OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ANIMATED BG */
+  .bg-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+    animation: orb-drift 20s ease-in-out infinite alternate;
+  }
+  .bg-orb-1 { width: 500px; height: 500px; background: rgba(201,169,110,0.04); top: -100px; right: -100px; animation-delay: 0s; }
+  .bg-orb-2 { width: 400px; height: 400px; background: rgba(124,154,142,0.04); bottom: 100px; left: -100px; animation-delay: -7s; }
+  .bg-orb-3 { width: 300px; height: 300px; background: rgba(201,169,110,0.03); top: 50%; left: 40%; animation-delay: -14s; }
+
+  @keyframes orb-drift {
+    0% { transform: translate(0,0) scale(1); }
+    100% { transform: translate(30px, 20px) scale(1.1); }
+  }
+
+  /* LAYOUT */
+  .app-shell {
+    position: relative;
+    z-index: 1;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 0 0 100px;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 32px 20px 24px;
+    border-bottom: 1px solid var(--border);
+    animation: fade-down 0.6s ease both;
+  }
+
+  .header-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    color: var(--cream);
+  }
+
+  .header-title span {
+    color: var(--gold);
+    font-style: italic;
+  }
+
+  .header-sub {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.03em;
+  }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    padding: 5px 12px;
+    background: var(--gold-dim);
+    border: 1px solid rgba(201,169,110,0.2);
+    border-radius: 20px;
+    font-size: 11px;
+    color: var(--gold2);
+    letter-spacing: 0.05em;
+  }
+
+  .dot-live {
+    width: 6px; height: 6px;
+    background: var(--gold2);
+    border-radius: 50%;
+    animation: pulse-dot 2s ease infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* NAV TABS */
+  .nav-tabs {
+    display: flex;
+    gap: 2px;
+    padding: 12px 16px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    animation: fade-down 0.6s 0.1s ease both;
+  }
+
+  .nav-tabs::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    flex-shrink: 0;
+    padding: 7px 14px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+
+  .tab-btn:hover { color: var(--cream); background: var(--surface); }
+
+  .tab-btn.active {
+    background: var(--gold-dim);
+    color: var(--gold2);
+    border: 1px solid rgba(201,169,110,0.2);
+  }
+
+  /* SECTIONS */
+  .section {
+    display: none;
+    animation: fade-up 0.4s ease both;
+  }
+
+  .section.active { display: block; }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fade-down {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* CARDS */
+  .card {
+    margin: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+  }
+
+  .card:hover { border-color: var(--border2); }
+
+  .card-header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .card-icon.gold { background: var(--gold-dim); }
+  .card-icon.green { background: rgba(124,168,124,0.12); }
+  .card-icon.red { background: rgba(201,112,112,0.12); }
+  .card-icon.blue { background: rgba(124,154,142,0.12); }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--cream);
+    letter-spacing: 0.01em;
+  }
+
+  .card-body { padding: 16px 20px; }
+
+  /* PROFILE GRID */
+  .profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 16px 20px;
+  }
+
+  .profile-chip {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .chip-label {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted2);
+  }
+
+  .chip-value {
+    font-size: 13px;
+    color: var(--cream);
+    font-weight: 400;
+  }
+
+  /* SCORE BAR */
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .score-row:last-child { border-bottom: none; }
+
+  .score-label {
+    font-size: 12px;
+    color: var(--muted);
+    width: 110px;
+    flex-shrink: 0;
+  }
+
+  .score-bar-track {
+    flex: 1;
+    height: 4px;
+    background: var(--bg3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1.2s cubic-bezier(0.16,1,0.3,1);
+    width: 0%;
+  }
+
+  .score-val {
+    font-size: 11px;
+    color: var(--gold);
+    font-weight: 500;
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* TAGS */
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .tag {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+
+  .tag.green { background: rgba(124,168,124,0.12); color: var(--success); border: 1px solid rgba(124,168,124,0.2); }
+  .tag.red { background: rgba(201,112,112,0.12); color: var(--danger); border: 1px solid rgba(201,112,112,0.2); }
+  .tag.gold { background: var(--gold-dim); color: var(--gold2); border: 1px solid rgba(201,169,110,0.2); }
+  .tag.blue { background: rgba(124,154,142,0.1); color: var(--accent2); border: 1px solid rgba(124,154,142,0.2); }
+  .tag.muted { background: var(--bg3); color: var(--muted); border: 1px solid var(--border); }
+
+  /* TIMELINE */
+  .timeline { padding: 8px 0; }
+
+  .tl-item {
+    display: flex;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .tl-item:last-child { border-bottom: none; }
+
+  .tl-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+    margin-top: 5px;
+    box-shadow: 0 0 8px rgba(201,169,110,0.4);
+  }
+
+  .tl-dot.grey { background: var(--muted2); box-shadow: none; }
+  .tl-dot.green { background: var(--success); box-shadow: 0 0 8px rgba(124,168,124,0.4); }
+
+  .tl-content {}
+  .tl-title { font-size: 13px; color: var(--cream); font-weight: 400; margin-bottom: 2px; }
+  .tl-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  /* PROGRESS MILESTONE */
+  .milestone-track {
+    position: relative;
+    padding: 16px 0 8px;
+  }
+
+  .milestone-line {
+    position: absolute;
+    top: 30px;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background: var(--border2);
+    border-radius: 1px;
+    z-index: 0;
+  }
+
+  .milestone-line-fill {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold2));
+    border-radius: 1px;
+    transition: width 1.5s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  .milestones {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+    padding: 0 4px;
+  }
+
+  .milestone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 64px;
+  }
+
+  .milestone-node {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border2);
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    transition: all 0.4s ease;
+  }
+
+  .milestone-node.done {
+    border-color: var(--gold);
+    background: var(--gold-dim);
+    color: var(--gold2);
+  }
+
+  .milestone-node.current {
+    border-color: var(--gold2);
+    background: var(--gold-dim);
+    box-shadow: 0 0 12px rgba(201,169,110,0.4);
+    animation: pulse-node 2s ease infinite;
+  }
+
+  @keyframes pulse-node {
+    0%, 100% { box-shadow: 0 0 12px rgba(201,169,110,0.4); }
+    50% { box-shadow: 0 0 20px rgba(201,169,110,0.7); }
+  }
+
+  .milestone-label {
+    font-size: 9px;
+    text-align: center;
+    color: var(--muted);
+    line-height: 1.3;
+    letter-spacing: 0.04em;
+  }
+
+  .milestone-label.active { color: var(--gold2); }
+
+  /* ROUTINE BLOCKS */
+  .routine-day {
+    margin-bottom: 12px;
+  }
+
+  .routine-day-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .day-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .day-badge.wash { background: rgba(124,154,142,0.12); color: var(--accent2); border: 1px solid rgba(124,154,142,0.2); }
+  .day-badge.dry { background: var(--bg3); color: var(--muted); border: 1px solid var(--border); }
+
+  .routine-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-left: 12px;
+    border-left: 1px solid var(--border);
+  }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--bg3);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .step-num {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--gold-dim);
+    color: var(--gold2);
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-text { font-size: 12px; color: var(--cream); line-height: 1.5; }
+  .step-note { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* LOG FORM */
+  .log-form { padding: 16px 20px; }
+
+  .form-group { margin-bottom: 16px; }
+
+  .form-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .slider-label { font-size: 11px; color: var(--muted); width: 70px; flex-shrink: 0; }
+
+  input[type="range"] {
+    flex: 1;
+    height: 3px;
+    accent-color: var(--gold);
+    cursor: pointer;
+    background: var(--border2);
+    border-radius: 2px;
+    appearance: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(201,169,110,0.5);
+  }
+
+  .slider-val {
+    font-size: 11px;
+    color: var(--gold);
+    width: 20px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    padding: 12px;
+    resize: none;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+  }
+
+  textarea:focus { outline: none; border-color: rgba(201,169,110,0.4); }
+  textarea::placeholder { color: var(--muted2); }
+
+  .product-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .product-chip {
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--bg3);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+
+  .product-chip.selected {
+    border-color: rgba(201,169,110,0.4);
+    color: var(--gold2);
+    background: var(--gold-dim);
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    color: var(--bg);
+    border: none;
+    border-radius: var(--r);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-transform: uppercase;
+  }
+
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(201,169,110,0.3); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-ghost {
+    padding: 8px 16px;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-ghost:hover { color: var(--cream); border-color: var(--border2); }
+
+  /* LOG ENTRIES */
+  .log-entry {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    animation: fade-up 0.3s ease both;
+  }
+
+  .log-entry:last-child { border-bottom: none; }
+
+  .log-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+
+  .log-date {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--cream);
+  }
+
+  .log-scores {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+
+  .log-score-chip {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--bg3);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .log-note { font-size: 11px; color: var(--muted); font-style: italic; }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted2);
+  }
+
+  .empty-state-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.5; }
+  .empty-state-text { font-size: 13px; line-height: 1.6; }
+
+  /* EVOLUTION CARDS */
+  .evolution-card {
+    margin: 8px 0;
+    padding: 14px 16px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .evolution-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 2px 0 0 2px;
+  }
+
+  .evolution-card.week::before { background: var(--accent); }
+  .evolution-card.month::before { background: var(--gold); }
+  .evolution-card.three::before { background: var(--gold2); }
+
+  .evo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .evo-period {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--cream);
+  }
+
+  .evo-tag {
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 10px;
+  }
+
+  .evo-list { list-style: none; }
+
+  .evo-list li {
+    font-size: 12px;
+    color: var(--muted);
+    padding: 4px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+  }
+
+  .evo-list li::before {
+    content: '→';
+    color: var(--gold);
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 11px;
+  }
+
+  /* PRODUCT CARDS */
+  .product-card {
+    padding: 14px 16px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    transition: border-color 0.2s;
+  }
+
+  .product-card:hover { border-color: var(--border2); }
+
+  .product-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .product-name {
+    font-size: 13px;
+    color: var(--cream);
+    font-weight: 400;
+  }
+
+  .product-category {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--gold-dim);
+    color: var(--gold2);
+    border: 1px solid rgba(201,169,110,0.15);
+  }
+
+  .product-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  /* RADAR / VISUAL SCORE */
+  .visual-score {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 16px 20px;
+  }
+
+  .vs-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .vs-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .vs-label { font-size: 10px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-size: 12px;
+    color: var(--cream);
+    z-index: 9998;
+    transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+    white-space: nowrap;
+    box-shadow: var(--shadow);
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 20px;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    padding: 20px 20px 8px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+  }
+
+  .section-title span { color: var(--gold); font-style: italic; }
+
+  .section-desc {
+    padding: 0 20px 12px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* CALLOUT */
+  .callout {
+    margin: 8px 16px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border-left: 3px solid;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .callout.gold { background: rgba(201,169,110,0.06); border-color: var(--gold); }
+  .callout.green { background: rgba(124,168,124,0.06); border-color: var(--success); }
+  .callout.red { background: rgba(201,112,112,0.06); border-color: var(--danger); }
+  .callout.blue { background: rgba(124,154,142,0.06); border-color: var(--accent); }
+
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .callout-text { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .callout-text strong { color: var(--cream); font-weight: 400; }
+
+  /* CHART */
+  .chart-container {
+    padding: 16px 20px;
+    height: 140px;
+    position: relative;
+  }
+
+  canvas { width: 100% !important; }
+
+  /* STREAK */
+  .streak-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+  }
+
+  .streak-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--gold2);
+    line-height: 1;
+  }
+
+  .streak-info {}
+  .streak-label { font-size: 13px; color: var(--cream); }
+  .streak-sub { font-size: 11px; color: var(--muted); }
+
+  /* WEEK GRID */
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    padding: 12px 20px 16px;
+  }
+
+  .week-day {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    cursor: default;
+    transition: all 0.2s ease;
+  }
+
+  .week-day.logged {
+    background: var(--gold-dim);
+    border-color: rgba(201,169,110,0.3);
+  }
+
+  .week-day.today {
+    border-color: rgba(201,169,110,0.5);
+    box-shadow: 0 0 8px rgba(201,169,110,0.2);
+  }
+
+  .week-day-name { font-size: 8px; color: var(--muted2); letter-spacing: 0.05em; text-transform: uppercase; }
+  .week-day-num { font-size: 11px; color: var(--muted); }
+  .week-day.logged .week-day-num { color: var(--gold2); }
+
+  /* DELETE BTN */
+  .btn-delete {
+    background: none;
+    border: none;
+    color: var(--danger);
+    font-size: 11px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    padding: 2px 6px;
+  }
+
+  .btn-delete:hover { opacity: 1; }
+
+  /* RESPONSIVE */
+  @media (max-width: 380px) {
+    .profile-grid { grid-template-columns: 1fr; }
+    .visual-score { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* SCROLL ANIMATIONS */
+  .animate-in {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .animate-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* HAIR TYPE VISUAL */
+  .hair-visual {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .hair-diagram {
+    width: 100px;
+    height: 120px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hair-strand {
+    position: absolute;
+    width: 3px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, var(--gold2), var(--gold));
+    transform-origin: top center;
+    animation: wave-hair 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes wave-hair {
+    0% { transform: translateX(0) rotate(var(--r)); }
+    100% { transform: translateX(3px) rotate(calc(var(--r) + 5deg)); }
+  }
+
+  /* SELECT */
+  select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    padding: 10px 12px;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  select:focus { outline: none; border-color: rgba(201,169,110,0.4); }
+
+  /* SEPARATOR */
+  .sep {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border2), transparent);
+    margin: 4px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<div class="bg-orb bg-orb-3"></div>
+
+<div class="app-shell">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-eyebrow">Sistema Capilar Personal</div>
+    <h1 class="header-title">Josué <span>Morales</span></h1>
+    <div class="header-sub">Diagnóstico · Rutina · Seguimiento</div>
+    <div class="header-badge">
+      <div class="dot-live"></div>
+      Plan activo · Old Money Aesthetic
+    </div>
+  </div>
+
+  <!-- NAV TABS -->
+  <nav class="nav-tabs" id="navTabs">
+    <button class="tab-btn active" onclick="showTab('diagnostico', this)">Diagnóstico</button>
+    <button class="tab-btn" onclick="showTab('rutina', this)">Rutina</button>
+    <button class="tab-btn" onclick="showTab('productos', this)">Productos</button>
+    <button class="tab-btn" onclick="showTab('evolucion', this)">Evolución</button>
+    <button class="tab-btn" onclick="showTab('registro', this)">Registro</button>
+    <button class="tab-btn" onclick="showTab('historial', this)">Historial</button>
+  </nav>
+
+  <!-- ===== DIAGNÓSTICO ===== -->
+  <section class="section active" id="sec-diagnostico">
+
+    <div class="section-title">Perfil <span>Capilar</span></div>
+    <div class="section-desc">Análisis completo basado en tu tipo, textura y comportamiento.</div>
+
+    <!-- PERFIL GRID -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">🧬</div>
+        <div class="card-title">Características Base</div>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-chip"><span class="chip-label">Tipo</span><span class="chip-value">Ondulado 2B</span></div>
+        <div class="profile-chip"><span class="chip-label">Grosor</span><span class="chip-value">Grueso</span></div>
+        <div class="profile-chip"><span class="chip-label">Densidad</span><span class="chip-value">Alta</span></div>
+        <div class="profile-chip"><span class="chip-label">Volumen</span><span class="chip-value">Mucho</span></div>
+        <div class="profile-chip"><span class="chip-label">Frizz</span><span class="chip-value">Frecuente</span></div>
+        <div class="profile-chip"><span class="chip-label">Porosidad</span><span class="chip-value">Media</span></div>
+      </div>
+    </div>
+
+    <!-- SCORES -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">📊</div>
+        <div class="card-title">Estado Actual</div>
+      </div>
+      <div class="card-body">
+        <div class="score-row">
+          <span class="score-label">Hidratación</span>
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:0%" data-target="68%" data-color="var(--accent2)"></div></div>
+          <span class="score-val">68%</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Fijación</span>
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:0%" data-target="30%" data-color="var(--warn)"></div></div>
+          <span class="score-val">30%</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Suavidad</span>
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:0%" data-target="60%" data-color="var(--success)"></div></div>
+          <span class="score-val">60%</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Control</span>
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:0%" data-target="35%" data-color="var(--danger)"></div></div>
+          <span class="score-val">35%</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">Definición</span>
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:0%" data-target="45%" data-color="var(--gold)"></div></div>
+          <span class="score-val">45%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORTALEZAS -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon green">✦</div>
+        <div class="card-title">Fortalezas</div>
+      </div>
+      <div class="card-body">
+        <div class="tags">
+          <span class="tag green">Volumen natural</span>
+          <span class="tag green">Textura rica</span>
+          <span class="tag green">Densidad alta</span>
+          <span class="tag green">Cabello grueso</span>
+          <span class="tag green">Patrón definido mojado</span>
+          <span class="tag green">Responde bien al acondicionador</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIMITACIONES -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon red">⚠</div>
+        <div class="card-title">Limitaciones Reales</div>
+      </div>
+      <div class="card-body">
+        <div class="tags">
+          <span class="tag red">Frizz crónico</span>
+          <span class="tag red">Pierde forma al secar</span>
+          <span class="tag red">Esponjamiento diurno</span>
+          <span class="tag red">Alta porosidad irregular</span>
+        </div>
+        <div style="margin-top:12px">
+          <div class="callout blue" style="margin:0">
+            <span class="callout-icon">ℹ</span>
+            <div class="callout-text">
+              El patrón ondulado grueso <strong>siempre tenderá al volumen</strong>. El objetivo no es eliminarlo, sino <strong>canalizarlo hacia una caída elegante</strong>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HIDRATACIÓN VS FIJACIÓN -->
+    <div class="section-title" style="padding-top:8px">El <span>Problema Real</span></div>
+
+    <div class="callout gold animate-in">
+      <span class="callout-icon">💧</span>
+      <div class="callout-text">
+        <strong>Problema de fijación, no de hidratación.</strong> Tu rutina actual ya hidrata bien — el acondicionador y la crema lo demuestran. Lo que falta es un agente que <strong>selle el patrón mojado</strong> y lo mantenga mientras se seca.
+      </div>
+    </div>
+
+    <div class="callout blue animate-in" style="margin-top:4px">
+      <span class="callout-icon">🌊</span>
+      <div class="callout-text">
+        El frizz aparece porque las cutículas del cabello ondulado grueso <strong>absorben humedad ambiental</strong> mientras se seca. La crema para peinar hidrata pero no forma barrera suficiente.
+      </div>
+    </div>
+
+    <!-- EXPECTATIVAS -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">🎯</div>
+        <div class="card-title">Expectativas Realistas</div>
+      </div>
+      <div class="card-body">
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot green"></div>
+            <div class="tl-content">
+              <div class="tl-title">Sí es posible lograr</div>
+              <div class="tl-desc">Caída natural y suave. Frizz reducido significativamente. Textura visible y elegante. Patrón que dure 6–8 horas.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--danger)"></div>
+            <div class="tl-content">
+              <div class="tl-title">No es posible (sin química)</div>
+              <div class="tl-desc">Cabello completamente liso como actores asiáticos. El patrón ondulado es genético. Reducir el volumen total al 100%.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot gold" style="background:var(--gold)"></div>
+            <div class="tl-content">
+              <div class="tl-title">Referente adaptado realista</div>
+              <div class="tl-desc">Caída limpia estilo Old Money: volumen controlado, textura suave, movimiento natural. Think: actor con cabello ligeramente ondulado bien trabajado.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===== RUTINA ===== -->
+  <section class="section" id="sec-rutina">
+
+    <div class="section-title">Rutina <span>Diaria</span></div>
+    <div class="section-desc">Pasos optimizados para tu tipo de cabello.</div>
+
+    <!-- DÍA DE LAVADO -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon blue">🚿</div>
+        <div class="card-title">Días de Lavado</div>
+      </div>
+      <div class="card-body">
+        <div class="routine-day">
+          <div class="routine-day-header">
+            <span class="day-badge wash">Lun · Mié · Vie · Dom</span>
+          </div>
+          <div class="routine-steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div>
+                <div class="step-text">Pre-enjuague con agua tibia (2 min)</div>
+                <div class="step-note">Abre la cutícula para mejor limpieza</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div>
+                <div class="step-text">Shampoo Elvive Hidra — solo raíz</div>
+                <div class="step-note">No frotar puntas. Masajear cuero cabelludo 60 seg</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div>
+                <div class="step-text">Enjuague completo con agua fría final</div>
+                <div class="step-note">El frío cierra cutícula — menos frizz</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div>
+                <div class="step-text">Acondicionador — de medios a puntas</div>
+                <div class="step-note">Dejar actuar 3 min. No enjuagar completamente</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">5</div>
+              <div>
+                <div class="step-text">Tocar suavemente con toalla (no frotar)</div>
+                <div class="step-note">Usar microfiber o camiseta de algodón</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">6</div>
+              <div>
+                <div class="step-text">Crema para peinar en cabello mojado al 80%</div>
+                <div class="step-note">Distribuir uniformemente, seccionar hacia atrás</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">7</div>
+              <div>
+                <div class="step-text">Secar al aire o difusor en frío</div>
+                <div class="step-note">No tocar mientras seca — activa el frizz</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DÍAS SECOS -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">☀</div>
+        <div class="card-title">Días Sin Lavado</div>
+      </div>
+      <div class="card-body">
+        <div class="routine-day">
+          <div class="routine-day-header">
+            <span class="day-badge dry">Mar · Jue · Sáb</span>
+          </div>
+          <div class="routine-steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div>
+                <div class="step-text">Mojar ligeramente con spray de agua</div>
+                <div class="step-note">Reactiva el patrón sin lavar</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div>
+                <div class="step-text">Pequeña cantidad de crema o aceite de argán</div>
+                <div class="step-note">Solo en medios y puntas para controlar frizz</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div>
+                <div class="step-text">Peinar con los dedos, no con peine</div>
+                <div class="step-note">El peine rompe el patrón ondulado</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PEINADO -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">✂</div>
+        <div class="card-title">Técnica de Peinado</div>
+      </div>
+      <div class="card-body">
+        <div class="callout gold" style="margin:0 0 12px">
+          <span class="callout-icon">💡</span>
+          <div class="callout-text"><strong>Regla de oro:</strong> Siempre peinar de atrás hacia adelante con los dedos mientras el cabello está mojado.</div>
+        </div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">Lado partido natural</div>
+              <div class="tl-desc">Busca la dirección natural del cabello. Forzar el partido aumenta el frizz y la resistencia.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">Evitar cepillo en seco</div>
+              <div class="tl-desc">El cepillo rompe los grupos de ondas. Usar peine de dientes anchos sólo en mojado.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">Dirección hacia abajo</div>
+              <div class="tl-desc">Al aplicar crema, siempre hacia abajo. Nunca hacia arriba — esto genera frizz instantáneo.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot green"></div>
+            <div class="tl-content">
+              <div class="tl-title">Touch-up de mediodía</div>
+              <div class="tl-desc">Si el cabello se esponja, mojar las manos y presionar suavemente hacia abajo. No repasar crema en seco.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HERRAMIENTAS -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon blue">🛠</div>
+        <div class="card-title">Herramientas Recomendadas</div>
+      </div>
+      <div class="card-body">
+        <div class="product-card">
+          <div class="product-card-header">
+            <span class="product-name">Toalla de microfibra</span>
+            <span class="product-category">Esencial</span>
+          </div>
+          <div class="product-desc">Reduce el frizz en un 40% comparado con toalla normal. Absorbe sin romper el patrón de onda.</div>
+        </div>
+        <div class="product-card">
+          <div class="product-card-header">
+            <span class="product-name">Peine de dientes anchos</span>
+            <span class="product-category">Esencial</span>
+          </div>
+          <div class="product-desc">Solo usar en ducha con acondicionador. Nunca en cabello seco o semiseco.</div>
+        </div>
+        <div class="product-card">
+          <div class="product-card-header">
+            <span class="product-name">Difusor para secadora</span>
+            <span class="product-category">Opcional</span>
+          </div>
+          <div class="product-desc">Acelera el secado sin crear frizz. Usar en temperatura baja. Invertir la cabeza al difusar para añadir definición.</div>
+        </div>
+        <div class="product-card">
+          <div class="product-card-header">
+            <span class="product-name">Spray de agua (atomizador)</span>
+            <span class="product-category">Recomendado</span>
+          </div>
+          <div class="product-desc">Indispensable para días sin lavado y retoques rápidos. Llevar en mochila para touch-up de mediodía.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CORTE Y LARGO -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">✂</div>
+        <div class="card-title">Corte & Largo</div>
+      </div>
+      <div class="card-body">
+        <div class="callout green" style="margin:0 0 10px">
+          <span class="callout-icon">✦</span>
+          <div class="callout-text">
+            <strong>Recomendación actual:</strong> Continuar creciendo 2–3 meses más antes de un corte significativo. El largo actual puede no permitir que el peso controle el frizz.
+          </div>
+        </div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot green"></div>
+            <div class="tl-content">
+              <div class="tl-title">Largo ideal: Medio-largo</div>
+              <div class="tl-desc">Entre 6–10 cm sobre la cabeza. El peso del cabello largo ayuda a controlar el volumen y caída.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">Próximo corte: En 8–10 semanas</div>
+              <div class="tl-desc">Solo puntas para eliminar daño. Pedir "corte en capas largas" para reducir volumen sin perder largo.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot grey"></div>
+            <div class="tl-content">
+              <div class="tl-title">Evitar: Corte muy corto</div>
+              <div class="tl-desc">En cabello ondulado grueso, el largo corto aumenta el volumen esférico. Contraproducente para Old Money.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===== PRODUCTOS ===== -->
+  <section class="section" id="sec-productos">
+
+    <div class="section-title">Stack de <span>Productos</span></div>
+    <div class="section-desc">Análisis actual y próximas incorporaciones.</div>
+
+    <!-- ACTUALES -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon green">✓</div>
+        <div class="card-title">Rutina Actual — Elvive</div>
+      </div>
+      <div class="card-body">
+        <div class="product-card">
+          <div class="product-card-header">
+            <span class="product-name">Shampoo Hidra Hialurónico</span>
+            <span class="product-category" style="background:rgba(124,168,124,0.12);color:var(--success);border-color:rgba(124,168,124,0.2)">Mantener</span>
+          </div>
+          <div class="product-desc">Limpieza suave con hidratación. Sin sulfatos agresivos. Compatible con cabello ondulado.</div>
+        </div>
+        <div class="product-card">
+          <div class="product-card-header">
+            <span class="product-name">Acondicionador Hidra Hialurónico</span>
+            <span class="product-category" style="background:rgba(124,168,124,0.12);color:var(--success);border-color:rgba(124,168,124,0.2)">Mantener</span>
+          </div>
+          <div class="product-desc">El responsable de la mejora notada. No enjuagar completamente — dejar residuo ligero para sellado.</div>
+        </div>
+        <div class="product-card">
+          <div class="product-card-header">
+            <span class="product-name">Crema para Peinar Hidra Hialurónico</span>
+            <span class="product-category" style="background:rgba(201,160,112,0.12);color:var(--warn);border-color:rgba(201,160,112,0.2)">Mejorable</span>
+          </div>
+          <div class="product-desc">Buena hidratación pero fijación insuficiente para cabello grueso. Necesita complemento o sustitución progresiva.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIGUIENTE NIVEL -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">→</div>
+        <div class="card-title">Próximo Nivel — Semana 3+</div>
+      </div>
+      <div class="card-body">
+        <div class="callout gold" style="margin:0 0 12px">
+          <span class="callout-icon">📅</span>
+          <div class="callout-text">Introducir estos productos <strong>uno a la vez</strong>, con 1 semana de diferencia, para identificar cuál hace la diferencia.</div>
+        </div>
+        <div class="product-card">
+          <div class="product-card-header">
+            <span class="product-name">Gel de fijación ligera (hold 2–3)</span>
+            <span class="product-category">Prioridad Alta</span>
+          </div>
+          <div class="product-desc">Garnier Fructis Style Curl, EcoStyler (verde, hold 10 — usar poco), o Cantu Curl Activator. Aplicar sobre crema mientras está mojado. Sella el patrón sin rigidez.</div>
+        </div>
+        <div class="product-card">
+          <div class="product-card-header">
+            <span class="product-name">Aceite de argán o jojoba (finishing)</span>
+            <span class="product-category">Prioridad Media</span>
+          </div>
+          <div class="product-desc">2–3 gotas en palma, pasar por medios y puntas al final. Añade brillo, reduce frizz visible y da la apariencia de suavidad característica del look Old Money.</div>
+        </div>
+        <div class="product-card">
+          <div class="product-card-header">
+            <span class="product-name">Leave-in ligero (spray)</span>
+            <span class="product-category">Prioridad Media</span>
+          </div>
+          <div class="product-desc">Aplicar entre acondicionador y crema. Crea capa de hidratación extra que reduce absorción de humedad ambiental — el origen del frizz.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POMADA — REINTRODUCCIÓN -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">🫙</div>
+        <div class="card-title">¿Cuándo Volver a la Pomada?</div>
+      </div>
+      <div class="card-body">
+        <div class="callout red" style="margin:0 0 12px">
+          <span class="callout-icon">⏸</span>
+          <div class="callout-text"><strong>Pausa mínima: 4 semanas.</strong> La pomada y cera actuaron sobre un cabello sin protocolo de hidratación. Necesitas establecer la base primero.</div>
+        </div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot grey"></div>
+            <div class="tl-content">
+              <div class="tl-title">Semanas 1–4: Solo rutina actual</div>
+              <div class="tl-desc">Optimizar la base. No añadir pomada.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot grey"></div>
+            <div class="tl-content">
+              <div class="tl-title">Semanas 5–8: Gel ligero</div>
+              <div class="tl-desc">Reemplaza la función de fijación de la pomada sin sus desventajas.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot grey"></div>
+            <div class="tl-content">
+              <div class="tl-title">Mes 3+: Pomada agua — solo terminación</div>
+              <div class="tl-desc">Pequeña cantidad ÚNICAMENTE en la raíz o partido para control de peinado. No como fijador general.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESTILOS COMPATIBLES -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">👤</div>
+        <div class="card-title">Estilos Compatibles</div>
+      </div>
+      <div class="card-body">
+        <div class="product-card">
+          <div class="product-card-header">
+            <span class="product-name">Natural Flow (recomendado)</span>
+            <span class="product-category" style="background:var(--gold-dim);color:var(--gold2)">Ideal</span>
+          </div>
+          <div class="product-desc">Cabello ligeramente partido, caído hacia los lados con movimiento natural. El gel ligero mantiene el patrón ondulado definido. Old Money por excelencia.</div>
+        </div>
+        <div class="product-card">
+          <div class="product-card-header">
+            <span class="product-name">Brushed Back Suave</span>
+            <span class="product-category">Compatible</span>
+          </div>
+          <div class="product-desc">Cabello peinado hacia atrás con manos, sin rigidez. Requiere gel ligero + aceite finishing. Look limpio y sofisticado.</div>
+        </div>
+        <div class="product-card">
+          <div class="product-card-header">
+            <span class="product-name">Side Part Natural</span>
+            <span class="product-category">Compatible</span>
+          </div>
+          <div class="product-desc">Partido al lado natural del cabello. Con largo suficiente y gel ligero logra el volumen controlado característico del estilo old money.</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===== EVOLUCIÓN ===== -->
+  <section class="section" id="sec-evolucion">
+
+    <div class="section-title">Evolución <span>Esperada</span></div>
+    <div class="section-desc">Proyección basada en tu perfil y rutina propuesta.</div>
+
+    <!-- MILESTONE TRACK -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">📈</div>
+        <div class="card-title">Línea de Tiempo</div>
+      </div>
+      <div style="padding: 16px 20px;">
+        <div class="milestone-track">
+          <div class="milestone-line">
+            <div class="milestone-line-fill" id="milestoneFill" style="width:0%"></div>
+          </div>
+          <div class="milestones">
+            <div class="milestone">
+              <div class="milestone-node current" id="mn0">▶</div>
+              <div class="milestone-label active">Hoy</div>
+            </div>
+            <div class="milestone">
+              <div class="milestone-node" id="mn1">1S</div>
+              <div class="milestone-label">1 Semana</div>
+            </div>
+            <div class="milestone">
+              <div class="milestone-node" id="mn2">1M</div>
+              <div class="milestone-label">1 Mes</div>
+            </div>
+            <div class="milestone">
+              <div class="milestone-node" id="mn3">3M</div>
+              <div class="milestone-label">3 Meses</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVOLUTION CARDS -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon blue">📅</div>
+        <div class="card-title">Proyecciones por Etapa</div>
+      </div>
+      <div class="card-body">
+        <div class="evolution-card week">
+          <div class="evo-header">
+            <span class="evo-period">1 Semana</span>
+            <span class="evo-tag tag blue">Fase base</span>
+          </div>
+          <ul class="evo-list">
+            <li>Cabello notablemente más suave y manejable después del lavado</li>
+            <li>Frizz ligeramente reducido en las primeras horas</li>
+            <li>Patrón ondulado más visible y definido mojado</li>
+            <li>Todavía perderá forma en la tarde — normal en esta etapa</li>
+          </ul>
+        </div>
+
+        <div class="evolution-card month" style="margin-top:8px">
+          <div class="evo-header">
+            <span class="evo-period">1 Mes</span>
+            <span class="evo-tag tag gold">Fase gel</span>
+          </div>
+          <ul class="evo-list">
+            <li>Con gel ligero incorporado: patrón aguanta 5–7 horas</li>
+            <li>Frizz reducido al 50–60% del estado actual</li>
+            <li>Caída más natural y menos esponjamiento diurno</li>
+            <li>Mayor brillo y apariencia de salud general</li>
+            <li>Comprensión clara de qué funciona para tu cabello</li>
+          </ul>
+        </div>
+
+        <div class="evolution-card three" style="margin-top:8px">
+          <div class="evo-header">
+            <span class="evo-period">3 Meses</span>
+            <span class="evo-tag tag gold">Fase refinada</span>
+          </div>
+          <ul class="evo-list">
+            <li>Stack de productos optimizado y personalizado</li>
+            <li>Rutina en autopiloto — 8 min máximo por mañana</li>
+            <li>Frizz manejado al 70–80% (residual siempre existirá)</li>
+            <li>Largo ideal alcanzado para estilos Old Money</li>
+            <li>Opción de reintroducir pomada de agua como finish</li>
+            <li>Look elegante reproducible día a día</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISUAL SCORES PROJECTED -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">✦</div>
+        <div class="card-title">Métricas Proyectadas — 3 Meses</div>
+      </div>
+      <div class="visual-score">
+        <div class="vs-item">
+          <div class="vs-val" style="color:var(--accent2)">85<span style="font-size:14px;color:var(--muted)">%</span></div>
+          <div class="vs-label">Hidratación</div>
+        </div>
+        <div class="vs-item">
+          <div class="vs-val" style="color:var(--gold)">75<span style="font-size:14px;color:var(--muted)">%</span></div>
+          <div class="vs-label">Fijación</div>
+        </div>
+        <div class="vs-item">
+          <div class="vs-val" style="color:var(--success)">80<span style="font-size:14px;color:var(--muted)">%</span></div>
+          <div class="vs-label">Suavidad</div>
+        </div>
+        <div class="vs-item">
+          <div class="vs-val" style="color:var(--gold2)">70<span style="font-size:14px;color:var(--muted)">%</span></div>
+          <div class="vs-label">Control</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEGUIMIENTO SEMANAL -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">📋</div>
+        <div class="card-title">Plan de Seguimiento</div>
+      </div>
+      <div class="card-body">
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot green"></div>
+            <div class="tl-content">
+              <div class="tl-title">Registro diario (sección Registro)</div>
+              <div class="tl-desc">Anotar nivel de frizz, control y observaciones cada mañana. Mínimo 5 días por semana.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">Evaluación semanal</div>
+              <div class="tl-desc">Cada domingo revisar el patrón de la semana antes de decidir si introducir un nuevo producto.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-title">Foto de referencia</div>
+              <div class="tl-desc">Tomar foto cada lunes por la mañana (mismo ángulo) para comparar evolución visual.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot grey"></div>
+            <div class="tl-content">
+              <div class="tl-title">Revisión de stack al mes</div>
+              <div class="tl-desc">¿La crema sigue siendo suficiente? ¿El gel está funcionando? Ajustar según resultados.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===== REGISTRO ===== -->
+  <section class="section" id="sec-registro">
+
+    <div class="section-title">Registro <span>Diario</span></div>
+    <div class="section-desc">Documenta tu progreso para identificar patrones.</div>
+
+    <!-- STREAK -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">🔥</div>
+        <div class="card-title">Racha Actual</div>
+      </div>
+      <div class="streak-display">
+        <div class="streak-num" id="streakNum">0</div>
+        <div class="streak-info">
+          <div class="streak-label">días consecutivos</div>
+          <div class="streak-sub">Total registrado: <span id="totalLogs">0</span> entradas</div>
+        </div>
+      </div>
+      <!-- WEEK GRID -->
+      <div class="week-grid" id="weekGrid"></div>
+    </div>
+
+    <!-- FORM -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">✏</div>
+        <div class="card-title">Nueva Entrada — <span id="todayLabel" style="font-size:14px;color:var(--gold);font-family:'Cormorant Garamond',serif;font-style:italic"></span></div>
+      </div>
+      <div class="log-form">
+
+        <div class="form-group">
+          <label class="form-label">Productos usados hoy</label>
+          <div class="product-chips" id="productChips">
+            <div class="product-chip" onclick="toggleChip(this)" data-val="shampoo">Shampoo</div>
+            <div class="product-chip" onclick="toggleChip(this)" data-val="acond">Acondicionador</div>
+            <div class="product-chip" onclick="toggleChip(this)" data-val="crema">Crema Peinar</div>
+            <div class="product-chip" onclick="toggleChip(this)" data-val="gel">Gel</div>
+            <div class="product-chip" onclick="toggleChip(this)" data-val="aceite">Aceite</div>
+            <div class="product-chip" onclick="toggleChip(this)" data-val="spray">Spray Agua</div>
+            <div class="product-chip" onclick="toggleChip(this)" data-val="leavein">Leave-in</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Indicadores del día</label>
+          <div class="slider-group">
+            <div class="slider-row">
+              <span class="slider-label">Frizz</span>
+              <input type="range" min="1" max="10" value="7" id="slFrizz" oninput="updateSlider(this,'vFrizz')">
+              <span class="slider-val" id="vFrizz">7</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label">Control</span>
+              <input type="range" min="1" max="10" value="4" id="slControl" oninput="updateSlider(this,'vControl')">
+              <span class="slider-val" id="vControl">4</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label">Suavidad</span>
+              <input type="range" min="1" max="10" value="5" id="slSuavidad" oninput="updateSlider(this,'vSuavidad')">
+              <span class="slider-val" id="vSuavidad">5</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label">Duración look</span>
+              <input type="range" min="1" max="12" value="3" id="slDuracion" oninput="updateSlider(this,'vDuracion')">
+              <span class="slider-val" id="vDuracion">3</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Clima / Ambiente</label>
+          <select id="selClima">
+            <option value="">— Seleccionar —</option>
+            <option value="seco">Seco / Frío</option>
+            <option value="normal">Normal</option>
+            <option value="humedo">Húmedo / Caluroso</option>
+            <option value="lluvia">Lluvioso</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Observaciones del día</label>
+          <textarea id="txtObs" rows="3" placeholder="¿Cómo amaneció? ¿Hubo algo diferente? ¿Probaste algo nuevo?..."></textarea>
+        </div>
+
+        <button class="btn-primary" onclick="saveLog()">Guardar Entrada</button>
+
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===== HISTORIAL ===== -->
+  <section class="section" id="sec-historial">
+
+    <div class="section-title">Historial <span>&</span> Tendencias</div>
+    <div class="section-desc">Evolución registrada y patrones identificados.</div>
+
+    <!-- CHART -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">📊</div>
+        <div class="card-title">Tendencia Últimos 7 Días</div>
+      </div>
+      <div class="chart-container">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+
+    <!-- PROMEDIOS -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon blue">≡</div>
+        <div class="card-title">Promedios Globales</div>
+      </div>
+      <div class="card-body" id="avgDisplay">
+        <div class="empty-state" style="padding:20px 0">
+          <div class="empty-state-text" style="color:var(--muted2)">Sin datos aún</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOG LIST -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-icon gold">📝</div>
+        <div class="card-title">Entradas Recientes</div>
+      </div>
+      <div id="logList">
+        <div class="empty-state">
+          <div class="empty-state-icon">📓</div>
+          <div class="empty-state-text">Aún no hay registros.<br>Ve a la sección Registro para comenzar.</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== STATE =====
+const STORAGE_KEY = 'hairlog_josue_v1';
+let logs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+// ===== TABS =====
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  btn.classList.add('active');
+  setTimeout(initAnimations, 50);
+  if (id === 'historial') renderHistorial();
+  if (id === 'registro') renderWeekGrid();
+}
+
+// ===== SLIDERS =====
+function updateSlider(el, valId) {
+  document.getElementById(valId).textContent = el.value;
+}
+
+// ===== PRODUCT CHIPS =====
+function toggleChip(el) {
+  el.classList.toggle('selected');
+}
+
+// ===== DATE =====
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function formatDate(str) {
+  const d = new Date(str + 'T12:00:00');
+  return d.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
+function shortDate(str) {
+  const d = new Date(str + 'T12:00:00');
+  return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' });
+}
+
+// ===== INIT TODAY LABEL =====
+function initTodayLabel() {
+  document.getElementById('todayLabel').textContent = formatDate(todayStr());
+}
+
+// ===== SAVE LOG =====
+function saveLog() {
+  const today = todayStr();
+  const existing = logs.find(l => l.date === today);
+  if (existing) {
+    showToast('Ya existe una entrada para hoy. Ve al historial para verla.');
+    return;
+  }
+
+  const products = Array.from(document.querySelectorAll('.product-chip.selected')).map(c => c.dataset.val);
+  const entry = {
+    date: today,
+    frizz: parseInt(document.getElementById('slFrizz').value),
+    control: parseInt(document.getElementById('slControl').value),
+    suavidad: parseInt(document.getElementById('slSuavidad').value),
+    duracion: parseInt(document.getElementById('slDuracion').value),
+    clima: document.getElementById('selClima').value,
+    obs: document.getElementById('txtObs').value.trim(),
+    products
+  };
+
+  logs.unshift(entry);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+
+  // reset
+  document.querySelectorAll('.product-chip').forEach(c => c.classList.remove('selected'));
+  document.getElementById('slFrizz').value = 7; document.getElementById('vFrizz').textContent = '7';
+  document.getElementById('slControl').value = 4; document.getElementById('vControl').textContent = '4';
+  document.getElementById('slSuavidad').value = 5; document.getElementById('vSuavidad').textContent = '5';
+  document.getElementById('slDuracion').value = 3; document.getElementById('vDuracion').textContent = '3';
+  document.getElementById('selClima').value = '';
+  document.getElementById('txtObs').value = '';
+
+  updateStreak();
+  renderWeekGrid();
+  showToast('✓ Entrada guardada correctamente');
+}
+
+// ===== STREAK =====
+function updateStreak() {
+  const total = logs.length;
+  document.getElementById('totalLogs').textContent = total;
+
+  if (total === 0) { document.getElementById('streakNum').textContent = '0'; return; }
+
+  const sorted = [...logs].sort((a,b) => b.date.localeCompare(a.date));
+  let streak = 0;
+  let current = new Date(todayStr());
+
+  for (let i = 0; i < sorted.length; i++) {
+    const logDate = new Date(sorted[i].date + 'T12:00:00');
+    const diff = Math.round((current - logDate) / 86400000);
+    if (diff === 0 || diff === 1) {
+      streak++;
+      current = logDate;
+    } else break;
+  }
+
+  document.getElementById('streakNum').textContent = streak;
+}
+
+// ===== WEEK GRID =====
+function renderWeekGrid() {
+  const grid = document.getElementById('weekGrid');
+  grid.innerHTML = '';
+  const days = ['D','L','M','M','J','V','S'];
+  const today = new Date();
+  const todayS = todayStr();
+
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    const logged = logs.some(l => l.date === ds);
+    const isToday = ds === todayS;
+
+    const el = document.createElement('div');
+    el.className = 'week-day' + (logged ? ' logged' : '') + (isToday ? ' today' : '');
+    el.innerHTML = `<span class="week-day-name">${days[d.getDay()]}</span><span class="week-day-num">${d.getDate()}</span>`;
+    grid.appendChild(el);
+  }
+}
+
+// ===== HISTORIAL =====
+function renderHistorial() {
+  renderLogList();
+  renderAvgs();
+  renderChart();
+}
+
+function renderLogList() {
+  const container = document.getElementById('logList');
+  if (logs.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📓</div><div class="empty-state-text">Aún no hay registros.<br>Ve a la sección Registro para comenzar.</div></div>';
+    return;
+  }
+
+  const sorted = [...logs].sort((a,b) => b.date.localeCompare(a.date)).slice(0,20);
+  container.innerHTML = sorted.map((l,i) => `
+    <div class="log-entry">
+      <div class="log-entry-header">
+        <span class="log-date">${formatDate(l.date)}</span>
+        <button class="btn-delete" onclick="deleteLog('${l.date}')">✕</button>
+      </div>
+      <div class="log-scores">
+        <span class="log-score-chip">Frizz ${l.frizz}/10</span>
+        <span class="log-score-chip">Control ${l.control}/10</span>
+        <span class="log-score-chip">Suavidad ${l.suavidad}/10</span>
+        <span class="log-score-chip">${l.duracion}h look</span>
+        ${l.clima ? `<span class="log-score-chip">${climaLabel(l.clima)}</span>` : ''}
+      </div>
+      ${l.products && l.products.length ? `<div class="log-scores">${l.products.map(p=>`<span class="log-score-chip" style="color:var(--gold2)">${prodLabel(p)}</span>`).join('')}</div>` : ''}
+      ${l.obs ? `<div class="log-note">"${l.obs}"</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function climaLabel(c) {
+  const map = {seco:'Seco',normal:'Normal',humedo:'Húmedo',lluvia:'Lluvia'};
+  return map[c] || c;
+}
+
+function prodLabel(p) {
+  const map = {shampoo:'Shampoo',acond:'Acond.',crema:'Crema',gel:'Gel',aceite:'Aceite',spray:'Spray',leavein:'Leave-in'};
+  return map[p] || p;
+}
+
+function deleteLog(date) {
+  logs = logs.filter(l => l.date !== date);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+  renderHistorial();
+  updateStreak();
+  renderWeekGrid();
+  showToast('Entrada eliminada');
+}
+
+function renderAvgs() {
+  const container = document.getElementById('avgDisplay');
+  if (logs.length === 0) {
+    container.innerHTML = '<div class="empty-state" style="padding:20px 0"><div class="empty-state-text" style="color:var(--muted2)">Sin datos aún</div></div>';
+    return;
+  }
+
+  const n = logs.length;
+  const avg = (key) => (logs.reduce((s,l) => s + l[key], 0) / n).toFixed(1);
+  const frizz = avg('frizz');
+  const control = avg('control');
+  const suav = avg('suavidad');
+  const dur = avg('duracion');
+
+  container.innerHTML = `
+    <div class="score-row">
+      <span class="score-label">Frizz promedio</span>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:${frizz*10}%;background:var(--danger)"></div></div>
+      <span class="score-val">${frizz}</span>
+    </div>
+    <div class="score-row">
+      <span class="score-label">Control promedio</span>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:${control*10}%;background:var(--accent2)"></div></div>
+      <span class="score-val">${control}</span>
+    </div>
+    <div class="score-row">
+      <span class="score-label">Suavidad prom.</span>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:${suav*10}%;background:var(--success)"></div></div>
+      <span class="score-val">${suav}</span>
+    </div>
+    <div class="score-row">
+      <span class="score-label">Duración look</span>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:${dur/12*100}%;background:var(--gold)"></div></div>
+      <span class="score-val">${dur}h</span>
+    </div>
+  `;
+}
+
+// ===== CHART =====
+let chartInstance = null;
+
+function renderChart() {
+  const canvas = document.getElementById('trendChart');
+  const ctx = canvas.getContext('2d');
+
+  const last7 = [...logs].sort((a,b) => a.date.localeCompare(b.date)).slice(-7);
+  if (last7.length < 2) {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = 'rgba(240,235,226,0.2)';
+    ctx.font = '12px DM Sans';
+    ctx.textAlign = 'center';
+    ctx.fillText('Registra al menos 2 días para ver tendencias', canvas.width/2 || 160, 60);
+    return;
+  }
+
+  const labels = last7.map(l => shortDate(l.date));
+  const frizzData = last7.map(l => l.frizz);
+  const controlData = last7.map(l => l.control);
+  const suavData = last7.map(l => l.suavidad);
+
+  if (chartInstance) chartInstance = null;
+
+  // Manual canvas chart
+  drawLineChart(ctx, canvas, labels, [
+    { data: frizzData, color: 'rgba(201,112,112,0.8)', label: 'Frizz' },
+    { data: controlData, color: 'rgba(163,196,181,0.8)', label: 'Control' },
+    { data: suavData, color: 'rgba(201,169,110,0.8)', label: 'Suavidad' },
+  ]);
+}
+
+function drawLineChart(ctx, canvas, labels, series) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = 120 * dpr;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = '120px';
+  ctx.scale(dpr, dpr);
+
+  const W = rect.width;
+  const H = 120;
+  const padL = 8, padR = 8, padT = 12, padB = 24;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + (chartH / 4) * i;
+    ctx.beginPath();
+    ctx.moveTo(padL, y);
+    ctx.lineTo(W - padR, y);
+    ctx.stroke();
+  }
+
+  const n = labels.length;
+  const xStep = chartW / (n - 1);
+
+  series.forEach(s => {
+    const pts = s.data.map((v, i) => ({
+      x: padL + i * xStep,
+      y: padT + chartH - ((v - 1) / 9) * chartH
+    }));
+
+    // Area fill
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, padT + chartH);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(pts[pts.length-1].x, padT + chartH);
+    ctx.closePath();
+    ctx.fillStyle = s.color.replace('0.8)', '0.08)');
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      const cp1x = pts[i-1].x + xStep * 0.4;
+      const cp1y = pts[i-1].y;
+      const cp2x = pts[i].x - xStep * 0.4;
+      const cp2y = pts[i].y;
+      ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, pts[i].x, pts[i].y);
+    }
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Dots
+    pts.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = s.color;
+      ctx.fill();
+    });
+  });
+
+  // X labels
+  ctx.fillStyle = 'rgba(240,235,226,0.3)';
+  ctx.font = '9px DM Sans';
+  ctx.textAlign = 'center';
+  labels.forEach((l, i) => {
+    ctx.fillText(l, padL + i * xStep, H - 6);
+  });
+
+  // Legend
+  let lx = padL;
+  series.forEach(s => {
+    ctx.fillStyle = s.color;
+    ctx.fillRect(lx, padT - 10, 10, 6);
+    ctx.fillStyle = 'rgba(240,235,226,0.4)';
+    ctx.font = '8px DM Sans';
+    ctx.textAlign = 'left';
+    ctx.fillText(s.label, lx + 13, padT - 5);
+    lx += 70;
+  });
+}
+
+// ===== SCORE BARS ANIMATION =====
+function animateScoreBars() {
+  document.querySelectorAll('.score-bar-fill[data-target]').forEach(el => {
+    const target = el.dataset.target;
+    const color = el.dataset.color;
+    setTimeout(() => {
+      el.style.background = color;
+      el.style.width = target;
+    }, 200);
+  });
+}
+
+// ===== MILESTONE FILL =====
+function animateMilestone() {
+  // Calculate progress based on logs
+  const daysSinceStart = logs.length > 0 ? Math.min(logs.length, 90) : 0;
+  const pct = Math.min((daysSinceStart / 90) * 100, 100);
+  const fill = document.getElementById('milestoneFill');
+  if (fill) setTimeout(() => { fill.style.width = pct + '%'; }, 300);
+
+  const nodes = ['mn1','mn2','mn3'];
+  const thresholds = [7, 30, 90];
+  nodes.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el && daysSinceStart >= thresholds[i]) el.classList.add('done');
+  });
+}
+
+// ===== SCROLL ANIMATIONS =====
+function initAnimations() {
+  const els = document.querySelectorAll('.animate-in:not(.visible)');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 60);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  els.forEach(el => observer.observe(el));
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ===== INIT =====
+function init() {
+  initTodayLabel();
+  updateStreak();
+  renderWeekGrid();
+  animateScoreBars();
+  animateMilestone();
+  setTimeout(initAnimations, 100);
+}
+
+window.addEventListener('load', init);
+window.addEventListener('resize', () => {
+  if (document.getElementById('sec-historial').classList.contains('active')) {
+    renderChart();
+  }
+});
+</script>
+</body>
+</html>
